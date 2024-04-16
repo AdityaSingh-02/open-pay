@@ -1,6 +1,7 @@
 import express from "express";
 import router from "./routes";
 import { PrismaClient } from "@prisma/client";
+// import db from "@repo/db/client"
 
 const app = express();
 app.use("/api", router);
@@ -9,10 +10,10 @@ app.get("/user", async (req, res) => {
   console.log("adding");
   const user = await db.user.create({
     data: {
-      name: "Aditya Singh",
-      email: "asaditya2002",
-      password: "Aditya@686",
-      number: Number("7982556413"),
+      name: "John doe",
+      email: "johndoe",
+      password: "johndoe",
+      number: "111111111",
       balance: {
         create: {
           amount: 1000,

@@ -12,7 +12,7 @@ model User {
   name     String?
   email    String    @unique
   password String
-  number   String       @unique
+  number   String    @unique
   balance  Balance[]
 }
 
