@@ -2,9 +2,8 @@ import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@repo/db/client";
 
-const prisma = new PrismaClient();
 export const options: NextAuthOptions = {
     providers: [
         GoogleProvider({
@@ -60,13 +59,17 @@ export const options: NextAuthOptions = {
 
                     const user = await prisma.user.create({
                         data: {
-                            // test your login dummy data here
-                            // Goto localhost:3002/user (update data as req) to seed dummy data
-                            // While using dummy data please remove hashed password
-                            name: credentials.name,
                             email: credentials.email,
-                            password: hashedPassword,
                             number: credentials.number,
+                            password: hashedPassword,
+                            name: "John Doe",
+                            username: credentials.email,
+                            balance: {
+                                create: {
+                                    amount: 0,
+                                    locked: 0
+                                }
+                            }
                         },
                     });
                     return {
@@ -82,4 +85,4 @@ export const options: NextAuthOptions = {
             },
         }),
     ],
-};
+}
