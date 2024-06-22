@@ -8,19 +8,28 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  name     String    @db.VarChar(25)
-  username String    @unique
-  email    String    @unique
-  password String
-  number   String    @unique
-  balance  Balance[]
+  id        Int       @id @default(autoincrement())
+  firstName String    @default("John") @db.VarChar(15)
+  lastName  String    @default("Doe") @db.VarChar(15)
+  username  String    @unique
+  email     String    @unique
+  password  String
+  number    String    @unique
+  accounts  Account[]
+}
+
+model Account {
+  id            Int       @default(autoincrement())
+  userId        Int       @unique
+  user          User      @relation(fields: [userId], references: [id])
+  accountNumber String    @unique
+  balance       Balance[]
 }
 
 model Balance {
-  id     Int  @default(autoincrement())
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id])
-  amount Int
-  locked Int
+  id      Int     @default(autoincrement())
+  userId  Int     @unique
+  amount  Int
+  locked  Int
+  Account Account @relation(fields: [userId], references: [userId])
 }

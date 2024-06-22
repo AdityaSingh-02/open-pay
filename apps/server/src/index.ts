@@ -8,15 +8,22 @@ app.get("/user", async (req, res) => {
   console.log("adding");
   const user = await prisma.user.create({
     data: {
-      name: "John doe",
+      firstName: "John",
+      lastName: "doe",
       email: "johndoe",
       number: "111111111",
       password: "password",
       username: "johndoe",
-      balance: {
+      accounts: {
         create: {
-          amount: 1000,
-          locked: 0
+          accountNumber: "111111111",
+          balance: {
+            create: {
+              amount: 0,
+              locked: 0
+            }
+          }
+
         }
       }
     },

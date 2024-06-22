@@ -8,11 +8,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@prisma/client": "^5.15.0",
+    "@prisma/client": "^5.15.1",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
     "@types/bcrypt": "^5.0.2",
-    "i": "^0.3.7",
     "npm": "^10.8.1",
     "prettier": "^3.2.5",
     "turbo": "latest"
