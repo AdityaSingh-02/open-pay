@@ -1,11 +1,9 @@
 import express from "express";
 import prisma from "../prismaSingleton";
+import jwt from "jsonwebtoken"
+import { JWT_SECRET } from "../config";
+
 export const router = express.Router();
-
-
-router.get("/users", (req, res) => {
-    res.send("Hello World");
-});
 
 router.post("/register", async (req, res) => {
     const {
@@ -18,14 +16,26 @@ router.post("/register", async (req, res) => {
         userPassword
     } = req.body;
     try {
-        const user = await prisma.user.findFirst({
+        const existingUser = await prisma.user.findFirst({
             where: {
-                email: userEmail
+                OR: [
+                    { email: userEmail },
+                    { username: userName },
+                    { number: userPhoneNumber }
+                ],
             }
         });
-        if (user) {
+
+        const existingAccount = await prisma.account.findFirst({
+            where: {
+                accountNumber: userAccountNumber
+            }
+        });
+
+        if (existingUser || existingAccount) {
             return res.status(400).send("User already exists");
         }
+
         const newUser = await prisma.user.create({
             data: {
                 email: userEmail,
@@ -47,8 +57,13 @@ router.post("/register", async (req, res) => {
                 }
             }
         });
-    } catch (error) {
-
+        if (newUser) {
+            const userId = newUser.id;
+            const token = jwt.sign({ userId }, JWT_SECRET);
+            return res.status(200).json({ token, msg: "Account Created" })
+        }
+    } catch (error: any) {
+        return res.status(400).json({ code: error.code, meta: error.meta.target })
     }
 
 })
