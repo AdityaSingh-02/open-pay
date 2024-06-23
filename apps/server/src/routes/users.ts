@@ -1,6 +1,7 @@
 import express from "express";
 import prisma from "../prismaSingleton";
 import jwt from "jsonwebtoken"
+import bcrypt from "bcryptjs"
 import { JWT_SECRET } from "../config";
 
 export const router = express.Router();
@@ -35,6 +36,7 @@ router.post("/register", async (req, res) => {
         if (existingUser || existingAccount) {
             return res.status(400).send("User already exists");
         }
+        const hashedPassword = await bcrypt.hash(userPassword, 10);
 
         const newUser = await prisma.user.create({
             data: {
@@ -43,7 +45,7 @@ router.post("/register", async (req, res) => {
                 firstName: userFirstName,
                 lastName: userLastName,
                 username: userName,
-                password: userPassword,
+                password: hashedPassword,
                 accounts: {
                     create: {
                         accountNumber: userAccountNumber,
@@ -57,13 +59,49 @@ router.post("/register", async (req, res) => {
                 }
             }
         });
-        if (newUser) {
-            const userId = newUser.id;
-            const token = jwt.sign({ userId }, JWT_SECRET);
-            return res.status(200).json({ token, msg: "Account Created" })
+        const userId = newUser.id;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+        const returnUser = {
+            firstName: newUser.firstName,
+            lastName: newUser.lastName,
+            email: newUser.email,
+            userName: newUser.username,
         }
+        return res.status(200).json({ token, msg: "Account Created", returnUser })
     } catch (error: any) {
         return res.status(400).json({ code: error.code, meta: error.meta.target })
     }
 
+});
+
+router.post("/signin", async (req, res) => {
+    const {
+        email,
+        password
+    } = req.body;
+    try {
+        const user = await prisma.user.findFirst({
+            where: { email }
+        });
+
+        if (!user) {
+            return res.status(404).json({ data: "No user found" })
+        }
+
+        const isValidUser = await bcrypt.compare(password, user.password);
+        if (!isValidUser) {
+            return res.status(400).json({ data: "Invalid Credentials" })
+        }
+        const userId = user.id;
+        const token = jwt.sign({ userId }, JWT_SECRET);
+        const returnUser = {
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            userName: user.username,
+        }
+        return res.status(200).json({ token, returnUser });
+    } catch (error: any) {
+        return res.status(400).send(error.message)
+    }
 })
