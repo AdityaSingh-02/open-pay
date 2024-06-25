@@ -114,14 +114,19 @@ router.post("/signin", async (req, res) => {
 });
 
 // @ts-ignore
-router.get("/me", authMiddleWare, async (req: IAuthMiddleware, res) => {
+router.post("/me", authMiddleWare, async (req: IAuthMiddleware, res) => {
     try {
         const user = await prisma.user.findFirst({
             where: {
                 id: req.userId
             }
-        })
-        console.log(user);
+        });
+        if (!user) {
+            res.status(404).json({ data: "User not found" })
+            return;
+        }
+        res.status(200).json(user);
+        return;
     } catch (error) {
 
     }
