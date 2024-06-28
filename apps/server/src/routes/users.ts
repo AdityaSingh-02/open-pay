@@ -130,4 +130,26 @@ router.post("/me", authMiddleWare, async (req: IAuthMiddleware, res) => {
     } catch (error) {
 
     }
-})
+});
+
+
+// @ts-ignore
+router.get("/balance", authMiddleWare, async (req: IAuthMiddleware, res) => {
+    const userId = req.userId;
+    try {
+        const balance = await prisma.balance.findFirst({
+            where: {
+                userId
+            }
+        });
+        if (!balance) {
+            res.status(404).json({ data: "No balance found" });
+            return;
+        }
+        res.status(200).json(balance.amount);
+        return;
+    } catch (error: any) {
+        res.status(400).send(error.message);
+        return;
+    }
+});
