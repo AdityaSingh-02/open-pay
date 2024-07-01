@@ -1,7 +1,7 @@
 "use client"
 
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { set, useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "@/components/shad/ui/button"
@@ -16,11 +16,9 @@ import {
 } from "@/components/shad/ui/form"
 import { Input } from "@/components/shad/ui/input"
 import { toast } from "@/components/shad/ui/use-toast"
+import { useEffect, useState } from "react"
 
 const FormSchema = z.object({
-    username: z.string().min(2, {
-        message: "Username must be at least 2 characters.",
-    }),
     firstName: z.string().min(2, {
         message: "First Name must be at least 2 characters.",
     }).max(15, { message: "First Name must be less than 20 characters." }),
@@ -39,7 +37,6 @@ export function RegistrationForm() {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            username: "",
             accountNumber: "",
             email: "",
             firstName: "",
@@ -64,22 +61,6 @@ export function RegistrationForm() {
         <div className="mx-auto md:w-[60%] md:border-2 py-10 rounded-xl m-10">
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="w-2/3 mx-auto space-y-2">
-                    <FormField
-                        control={form.control}
-                        name="username"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Username</FormLabel>
-                                <FormControl>
-                                    <Input type="text" placeholder="John Doe" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                    This is your public display name.
-                                </FormDescription>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
                     <FormField
                         control={form.control}
                         name="firstName"

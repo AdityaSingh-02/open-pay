@@ -1,11 +1,11 @@
+import { UserNameForm } from '@/components/UserNameForm'
 import React from 'react'
-import { RegistrationForm } from '@/components/RegistrationForm'
 
 const Register = () => {
   return (
     <>
-      <div className=''>
-          <RegistrationForm />
+      <div className='flex justify-center items-center h-screen'>
+        <UserNameForm />
       </div>
     </>
   )

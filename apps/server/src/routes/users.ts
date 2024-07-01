@@ -132,7 +132,6 @@ router.post("/me", authMiddleWare, async (req: IAuthMiddleware, res) => {
     }
 });
 
-
 // @ts-ignore
 router.get("/balance", authMiddleWare, async (req: IAuthMiddleware, res) => {
     const userId = req.userId;
@@ -153,3 +152,24 @@ router.get("/balance", authMiddleWare, async (req: IAuthMiddleware, res) => {
         return;
     }
 });
+
+router.get("/username-availability", async (req, res) => {
+    const { verifiyUsername } = req.body;
+    try {
+        const user = await prisma.user.findFirst({
+            where: {
+                username: verifiyUsername as string
+            }
+        });
+        if(user){
+            res.status(200).json({ data: false });
+            return;
+        }else{
+            res.status(200).json({ data: true });
+            return;
+        }
+    } catch (error: any) {
+        res.status(400).send(error.message);
+        return;
+    }
+})
